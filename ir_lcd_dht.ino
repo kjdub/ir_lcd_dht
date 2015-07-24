@@ -2,8 +2,9 @@
 #include <IRremote.h>
 #include <LiquidCrystal.h>
 
-// INITIALIZE HARDWARE
-// ===================
+// =================== //
+// INITIALIZE HARDWARE //
+// =================== //
 
 // define pin and object for DHT11
 #define dht_pin 2 
@@ -40,19 +41,19 @@ decode_results results;
 // initialize display (RS,E,D4,D5,D6,D7)
 LiquidCrystal LCD(7,8,9,10,11,12);
 
-// RUNTIME FUNCTIONS
-// =================
+// ================= //
+// RUNTIME FUNCTIONS //
+// ================= //
 
-// temperature/humidity display
+// function: calc f, display temp/humid
 int T=0;
 int H=0;
 int F=0;
 int lastTemp = millis();
-//
-const char deg = (char)223; // define degree symbol
-//
-void showTemp()
-{
+// define degree symbol
+const char deg = (char)223;  
+// 
+void showTemp(){
   LCD.setCursor(0,2);
   if( (( T==0)&&(H==0 )) || ( (abs(millis()-lastTemp))>7000) ) 
   { 
@@ -61,7 +62,6 @@ void showTemp()
     H = (int)DHT.humidity;
     F = (DHT.temperature*1.8)+32; 
   }
-
   LCD.print(T);
   LCD.print(deg);
   LCD.print("C (");
@@ -72,56 +72,54 @@ void showTemp()
   LCD.print("%H");
 }
 
-// display seconds since boot function
+// function: display seconds since boot 
 unsigned long int t;
-void showSecs()
-{
+void showSecs(){
   // get time (sec) since boot
   t = millis();
   t = t/1000;
-  
   // print seconds since boot
   LCD.setCursor(0,2);
   LCD.print(t);
 }
 
-// chose which function to run in current cycle based on remote input
-unsigned short int cFunc = 1; // global, manipulated in loop(), used in function_selector
+// function: execute function designated to cycle by cFunc
+unsigned short int cFunc = 1; // global, manipulated in loop(), default is temp
 void function_selector(){
   switch(cFunc)
   {
     case 1: showTemp(); break;
     case 2: showSecs(); break;
     default:
-      if(cFunc>2) cFunc=1; // wrap to lowest beyond highest
-      if(cFunc<1) cFunc=2; // wrap to highest beyond lowest
+      if(cFunc>2) cFunc=1; // wrap high to low
+      if(cFunc<1) cFunc=2; // wrap low to high
       break; 
   }
 }
 
 // pointless loading function
-void pLoad(LiquidCrystal &obj) {
+void pLoad(LiquidCrystal &obj, short t){
+  short tt = t/16;
   obj.setCursor(0,0);
   for(int i=0;i<16;i++)
   {
     obj.print(".");
-    delay(100);
+    delay(tt);
   }
   obj.clear();
 }
 
-// MAIN FUNCTIONS
-// ==============
+// ============== //
+// MAIN FUNCTIONS //
+// ============== //
  
 void setup() {
   delay(250); 
-  Serial.begin(9600);
   LCD.begin(16, 2);
-  pLoad(LCD);
+  pLoad(LCD, 1440);
+  LCD.setCursor(0,0); LCD.print("IR: (waiting)"); 
   IR.enableIRIn(); 
-  LCD.setCursor(0,0);
-  LCD.print("IR: (waiting)"); 
-  delay(250); 
+  delay(350); 
 }
 
 void loop() {
@@ -131,7 +129,6 @@ void loop() {
     LCD.clear();
     LCD.setCursor(0,0);
     LCD.print("IR: ");
-    //LCD.print(results.value);
     switch(results.value)
     {
       case CH: LCD.print("CH"); break;
@@ -144,7 +141,7 @@ void loop() {
       case VOL_D: LCD.print("VOL-"); break;
       case EQ: LCD.print("EQ"); break;
       case ZERO: LCD.print("0"); break;
-      case HND1: LCD.print("100+"); break; // run temp/humid
+      case HND1: LCD.print("100+"); break; 
       case HND2: LCD.print("200+"); break;
       case ONE: LCD.print("1"); break;
       case TWO: LCD.print("2"); break;
@@ -160,9 +157,6 @@ void loop() {
     }
     IR.resume();
   }
-
-  function_selector(); // runs cFunc
-
-  // wait 1/2 second
-  delay(500); 
+  function_selector(); // run "functions[cFunc]"
+  delay(500); // wait 500ms before new cycle
 }
