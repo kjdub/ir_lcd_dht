@@ -54,7 +54,7 @@ const char deg = (char)223; // define degree symbol
 void showTemp()
 {
   LCD.setCursor(0,2);
-  if( (( T==0)&&(H==0 )) || ( (abs(millis()-lastTemp))>2000) ) 
+  if( (( T==0)&&(H==0 )) || ( (abs(millis()-lastTemp))>7000) ) 
   { 
     DHT.read11(dht_pin); 
     T = (int)DHT.temperature;
