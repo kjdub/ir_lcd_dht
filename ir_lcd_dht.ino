@@ -70,6 +70,7 @@ void showTemp(){
   LCD.print("F H:");
   LCD.print(H);
   LCD.print((char)37); // printing % this way because red box on github is annoying
+  LCD.print("      "); // hide previous instead of clear(), length(max-min)=18-12=6
 }
 
 // function: display seconds since boot 
