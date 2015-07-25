@@ -55,7 +55,7 @@ const char deg = (char)223;
 // 
 void showTemp(){
   LCD.setCursor(0,2);
-  if( (( T==0)&&(H==0 )) || ( (abs(millis()-lastTemp))>7000) ) 
+  if( (( T==0)&&(H==0 )) || ( (abs(millis()-lastTemp))>7000) ) // minimize load on DHT11
   { 
     DHT.read11(dht_pin); 
     T = (int)DHT.temperature;
@@ -64,13 +64,12 @@ void showTemp(){
   }
   LCD.print(T);
   LCD.print(deg);
-  LCD.print("C (");
+  LCD.print("C ");
   LCD.print(F);
   LCD.print(deg);
-  LCD.print("F) ");
+  LCD.print("F H:");
   LCD.print(H);
   LCD.print((char)37); // printing % this way because red box on github is annoying
-  LCD.print("H");
 }
 
 // function: display seconds since boot 
