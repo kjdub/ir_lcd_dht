@@ -69,7 +69,8 @@ void showTemp(){
   LCD.print(deg);
   LCD.print("F) ");
   LCD.print(H);
-  LCD.print("%H");
+  LCD.print((char)37); // printing % this way because red box on github is annoying
+  LCD.print("H");
 }
 
 // function: display seconds since boot 
